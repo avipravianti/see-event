@@ -16,7 +16,7 @@ export default function ActionAreaCard({image, category, date, title, user}) {
         <>     
            
             <Card  sx={{ maxWidth: 288, boxShadow: 'none', }} onClick={() => history.push("/detail/1")}>
-              <CardActionArea>
+              <CardActionArea sx={{marginTop: '30px'}} >
                 <CardMedia component="img" height="200" width="288px" image={image} alt="event" />
                 <CardContent sx={{ padding: 0, marginTop: 2, marginLeft: 1, marginBottom: 2, marginRight: 1 }}>
                   <Typography variant="caption" component="div" sx={{ fontSize: 12, backgroundColor: '#F0F2E9', width: 82, height: 24, textAlign: 'center', paddingTop: 0.5 }}>

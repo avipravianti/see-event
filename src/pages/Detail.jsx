@@ -19,17 +19,10 @@ const Detail = () => {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        // const response = await axios({
-        //   method: 'get',
-        //   url: `https://timcevent.herokuapp.com/events/${id}`,
-        //   headers: {
-        //     token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImZpcnN0TmFtZSI6ImdlcnJ5IiwibGFzdE5hbWUiOiJwcmF0YW1hIiwiZW1haWwiOiJkb3duMUBnbWFpbC5jb20iLCJpYXQiOjE2MzY5NTkxNjl9.4EsPJTlFKT7GnU5FfSbNG6vNM-3JVhPI2tjE3GDYpCk",
-        //     "Access-Control-Allow-Origin": "*"
-        //   }
-        // })
+        const token = localStorage.getItem("token");
         const res = await axios.get(`https://timcevent.herokuapp.com/events/${id}`, {
           headers: {
-            token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImZpcnN0TmFtZSI6ImdlcnJ5IiwibGFzdE5hbWUiOiJwcmF0YW1hIiwiZW1haWwiOiJkb3duMUBnbWFpbC5jb20iLCJpYXQiOjE2MzY5NTkxNjl9.4EsPJTlFKT7GnU5FfSbNG6vNM-3JVhPI2tjE3GDYpCk",
+            token,
           },
         })
         setDataDetail(res.data.data)

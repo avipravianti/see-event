@@ -1,10 +1,10 @@
 import { Container, Typography, Stack } from "@mui/material"
 import CssBaseline from '@mui/material/CssBaseline';
-import CantFind from "./CantFind/CantFind";
+// import CantFind from "./CantFind/CantFind";
 import CategoryFilter from "./Category/CategoryFilter";
 import FilterDate from "./Date/DateFilter";
-import PageContent from "./PageContent/PageContent";
-import SortFilter from "./Sorting By/SortFilter";
+// import PageContent from "./PageContent/PageContent";
+// import SortFilter from "./Sorting By/SortFilter";
 
 
 const SearchFilter = () => {
@@ -20,7 +20,7 @@ const SearchFilter = () => {
                 fontSize: '20px',
                 fontFamily: 'Noto Sans',
             }}> 
-                Showing 68 Results for “How to”
+                Showing Results
             </Typography>
 
             {/* filter date, category, sort by.. */}
@@ -33,14 +33,14 @@ const SearchFilter = () => {
                 <CategoryFilter/>
 
                 {/* sorting by..  */}
-                <SortFilter/>
+                {/* <SortFilter/> */}
 
                 
             </Stack>
 
-            <CantFind/>
+            {/* <CantFind/> */}
 
-            <PageContent/>
+            {/* <PageContent/> */}
         </Container>
       </>
     )

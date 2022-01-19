@@ -28,13 +28,20 @@ const CommentsSection = () => {
     getComment();
   }, []);
 
-  const addComment = () => {
+  
+
+  const addComment = (data) => {
+    const token = localStorage.getItem("token");
+    const formdata = new FormData();
+    formdata.append("userId", data);
+    formdata.append("eventId", data);
+    formdata.append("comment", data);
     axios
       .post(
-        `https://timcevent.herokuapp.com/comments`,
+        `https://timcevent.herokuapp.com/comments`, formdata,
         {
           Headers: {
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAsImZpcnN0TmFtZSI6IkJhYmF6IiwibGFzdE5hbWUiOiJLcmVzbmEiLCJlbWFpbCI6ImtyZXNuYUBnbWFpbC5jb20iLCJpYXQiOjE2MzcxMzg1NjJ9.S9OlODAkODDKnEmZbvjOqUk6iPlZNyyz5ShNypL1jys',
+            token,
           },
         },
         {

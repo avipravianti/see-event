@@ -18,7 +18,7 @@ function App() {
           <Route path="/signin" component={SignIn} />
           <Route path="/signup" component={SignUp} />
           <Route path="/account" component={MyAccount} />
-          <Route path="/detail" component={Detail} />
+          <Route path="/detail/:id" component={Detail} />
           <Route path="/search" component={Search} />
         </Switch>
         <Footer/>

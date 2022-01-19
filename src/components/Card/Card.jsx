@@ -1,14 +1,14 @@
 import Typography from '@mui/material/Typography';
 import { Card, CardContent, CardMedia, CardActionArea } from '@mui/material';
-import { useHistory } from 'react-router';
+// import { useHistory } from 'react-router';
 
 
 export default function ActionAreaCard({ image, category, date, title, author }) {
 
-  const history = useHistory();
+  // const history = useHistory();
 
   return (
-    <Card sx={{ maxWidth: 288, boxShadow: 'none'}} onClick={() => history.push("/detail/1")}>
+    <Card sx={{ maxWidth: 288, boxShadow: 'none'}} >
       <CardActionArea>
         <CardMedia component="img" height="200" image={image} alt="event" />
         <CardContent sx={{ padding: 0, marginTop: 2, marginLeft: 1, marginBottom: 2, marginRight: 1 }}>

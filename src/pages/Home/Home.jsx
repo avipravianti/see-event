@@ -5,6 +5,7 @@ import { OutlinedInput, InputAdornment, FormControl, Button } from '@mui/materia
 import Card from '../../components/Card/Card';
 import './home.css';
 import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const history = useHistory();
@@ -39,7 +40,8 @@ const Home = () => {
 
     getApi();
     getEventsCategory();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
 
   const handleFilter = (event) => {
     const searchWord = event.target.value;
@@ -100,14 +102,24 @@ const Home = () => {
               <h1>Attend an event starting soon</h1>
               <p onClick={() => history.push('/search')}>more events</p>
             </div>
-            <div className="content-card">{eventSoon && eventSoon.map((item) => <Card image={item.photoEvent} category={item.category.name} date={item.dateStart} title={item.title} author={item.speakerName} />)}</div>
+            <div style={{ display: "flex", flexWrap: "wrap", marginLeft: "98px", justifyContent:"space-between", marginRight: '98px' }}>
+            {eventSoon && eventSoon.map((item) =>
+            <Link to={`/detail/${item.id}`}  >
+              <div className="content-card"> <Card image={item.photoEvent} category={item.category.name} date={item.dateStart} title={item.title} author={item.speakerName} /></div>
+            </Link>)}
+            </div>
           </div>
           <div className="content-wrapper">
             <div className="content-heading">
               <h1>Design events</h1>
-              <p onClick={() => history.push('/search')}>more events</p>
+              <p onClick={() => history.push('/search/ ')}>more events</p>
             </div>
-            <div className="content-card">{eventSoon && eventSoon.map((item) => <Card image={item.photoEvent} category={item.category.name} date={item.dateStart} title={item.title} author={item.speakerName} />)}</div>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent:"space-between", marginLeft: "98px", marginRight: '98px' }}>
+            {eventSoon && eventSoon.map((item) =>
+            <Link to={`/detail/${item.id}`}  >
+              <div className="content-card"> <Card image={item.photoEvent} category={item.category.name} date={item.dateStart} title={item.title} author={item.speakerName} /></div>
+            </Link>)}
+            </div>
           </div>
         </div>
       </div>

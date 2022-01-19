@@ -48,7 +48,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 120px 0px 136px;
+  margin: 120px 0px 90px;
 }
 
 .content-wrapper {
@@ -79,10 +79,10 @@
 }
 
 .content-card {
-  display: flex;
-  justify-content: space-between;
-  margin-left: 108px;
-  margin-right: 108px;
+  /* display: flex;
+  justify-content: space-between; */
+  margin-left: 18px;
+  /* margin-right: 108px; */
 }
 
 .dataResult {
