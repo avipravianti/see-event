@@ -1,56 +1,55 @@
-import axios from 'axios';
 import { useState, useEffect } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
+import axios from 'axios';
 import { OutlinedInput, InputAdornment, FormControl, Button } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import Card from '../../components/Card/Card';
-import './home.css';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
+import './home.css';
 
 const Home = () => {
   const history = useHistory();
-  const [getEventsSoon, setGetEventsSoon] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [wordEntered, setWordEntered] = useState('');
 
-  const eventSoon = getEventsSoon;
+  const [eventsSoon, setEventsSoon] = useState([]);
+  // const [filteredData, setFilteredData] = useState([]);
+  // const [wordEntered, setWordEntered] = useState('');
 
   useEffect(() => {
     const getApi = async () => {
       await axios
         .get('https://timcevent.herokuapp.com/events/home')
         .then(function (response) {
-          setGetEventsSoon(response.data.dataStarted.slice(0, 4));
-          console.log(getEventsSoon);
+          setEventsSoon(response.data.dataStarted.slice(0, 4));
+          //console.log(getEventsSoon);
         })
         .catch(function (error) {
           console.log(error);
         });
     };
 
-    const getEventsCategory = async () => {
-      try {
-        const res = await axios.get(`https://timcevent.herokuapp.com/events`);
-        setFilteredData(res.data.events);
-        console.log(res.data.events);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+    // const getEventsCategory = async () => {
+    //   try {
+    //     const res = await axios.get(`https://timcevent.herokuapp.com/events`);
+    //     setFilteredData(res.data.events);
+    //     console.log(res.data.events);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
 
     getApi();
-    getEventsCategory();
+    // getEventsCategory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); 
 
-  const handleFilter = (event) => {
-    const searchWord = event.target.value;
-    setWordEntered(searchWord);
-    const newFilter = filteredData.filter((value) => {
-      return value.title.toLowerCase().includes(searchWord.toLowerCase());
-    });
-    setFilteredData(newFilter);
-  };
+  // const handleFilter = (event) => {
+  //   const searchWord = event.target.value;
+  //   setWordEntered(searchWord);
+  //   const newFilter = filteredData.filter((value) => {
+  //     return value.title.toLowerCase().includes(searchWord.toLowerCase());
+  //   });
+  //   setFilteredData(newFilter);
+  // };
 
   return (
     <>
@@ -76,21 +75,21 @@ const Home = () => {
                   </InputAdornment>
                 }
                 placeholder="Search events"
-                value={wordEntered}
-                onChange={handleFilter}
+                // value={wordEntered}
+                // onChange={handleFilter}
                 sx={{ borderRadius: 10, backgroundColor: '#F0F0F1' }}
               />
-              {filteredData.length !== 0 && (
+              {/* {filteredData.length !== 0 && (
                 <div className="dataResult">
                   {filteredData.map((value, key) => {
                     return (
-                      <a className="dataItem" href="/detail" target="_blank">
+                      <a className="dataItem" href={`/detail/${value.id}`} target="_blank">
                         <p>{value.title} </p>
                       </a>
                     );
                   })}
                 </div>
-              )}
+              )} */}
             </FormControl>
           </div>
         </div>
@@ -103,7 +102,7 @@ const Home = () => {
               <p onClick={() => history.push('/search')}>more events</p>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", marginLeft: "98px", justifyContent:"space-between", marginRight: '98px' }}>
-            {eventSoon && eventSoon.map((item) =>
+            {eventsSoon && eventsSoon.map((item) =>
             <Link to={`/detail/${item.id}`}  >
               <div className="content-card"> <Card image={item.photoEvent} category={item.category.name} date={item.dateStart} title={item.title} author={item.speakerName} /></div>
             </Link>)}
@@ -115,7 +114,7 @@ const Home = () => {
               <p onClick={() => history.push('/search/ ')}>more events</p>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", justifyContent:"space-between", marginLeft: "98px", marginRight: '98px' }}>
-            {eventSoon && eventSoon.map((item) =>
+            {eventsSoon && eventsSoon.map((item) =>
             <Link to={`/detail/${item.id}`}  >
               <div className="content-card"> <Card image={item.photoEvent} category={item.category.name} date={item.dateStart} title={item.title} author={item.speakerName} /></div>
             </Link>)}
