@@ -48,7 +48,7 @@ const Home = () => {
   //   const newFilter = filteredData.filter((value) => {
   //     return value.title.toLowerCase().includes(searchWord.toLowerCase());
   //   });
-  //   setFilteredData(newFilter);
+  //   setFilteredData(newFilter)
   // };
 
   return (
