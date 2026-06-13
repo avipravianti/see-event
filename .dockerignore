@@ -1,0 +1,14 @@
+**/node_modules
+**/build
+**/dist
+**/coverage
+**/.env.local
+**/.env.*.local
+backend/.env
+.git
+.github
+.gitlab-ci.yml
+**/*.tsbuildinfo
+**/npm-debug.log*
+.DS_Store
+README.md

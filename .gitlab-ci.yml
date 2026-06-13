@@ -1,31 +1,95 @@
-image: node:15
+# GitLab CI/CD for the SeeEvent monorepo (frontend/ + backend/).
+# Mirror of the GitHub Actions workflows so the same pipeline runs on both.
+#
+# Frontend deploy variables (Settings > CI/CD > Variables):
+#   VITE_API_BASE_URL   - URL of the deployed backend API
+#   NETLIFY_AUTH_TOKEN  - Netlify personal access token (protected, masked)
+#   NETLIFY_SITE_ID     - Netlify site API ID
+image: node:20
 
-before_script:
-  - apt-get udpate -qq && apt-get install
-
-cache:
-  paths:
-    - node_modules/
+include:
+  - template: Security/SAST.gitlab-ci.yml
 
 stages:
+  - verify
   - build
-  - test
   - deploy
+  - test # SAST template attaches to the `test` stage
 
-build:
+# ----- Frontend (frontend/) -----------------------------------------------
+
+fe:verify:
+  stage: verify
+  cache:
+    key: { files: ['frontend/package-lock.json'] }
+    paths: ['frontend/.npm/', 'frontend/node_modules/']
+  script:
+    - cd frontend
+    - npm ci --cache .npm --prefer-offline
+    - npm run lint
+    - npm run typecheck
+    - npm test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes: ['frontend/**/*']
+
+fe:build:
   stage: build
+  cache:
+    key: { files: ['frontend/package-lock.json'] }
+    paths: ['frontend/.npm/', 'frontend/node_modules/']
   script:
-    - yarn install
-    - yarn run build
+    - cd frontend
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
   artifacts:
-    paths:
-      - node_modules/
-      - build/
-  only:
-    - default
+    paths: ['frontend/build/']
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes: ['frontend/**/*']
 
-deploy:
+fe:deploy:
   stage: deploy
+  needs: ['fe:build']
   script:
-    - npm install --unsafe-perm=true -g netlify-cli
-    - netlify deploy --dir=build --prod
+    - npm install -g netlify-cli
+    - netlify deploy --dir=frontend/build --prod --message "GitLab pipeline $CI_PIPELINE_IID"
+  environment:
+    name: production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes: ['frontend/**/*']
+
+# ----- Backend (backend/) -------------------------------------------------
+
+be:verify:
+  stage: verify
+  cache:
+    key: { files: ['backend/package-lock.json'] }
+    paths: ['backend/.npm/', 'backend/node_modules/']
+  script:
+    - cd backend
+    - npm ci --cache .npm --prefer-offline
+    - npm run lint
+    - npm run typecheck
+    - npm test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes: ['backend/**/*']
+
+be:build:
+  stage: build
+  cache:
+    key: { files: ['backend/package-lock.json'] }
+    paths: ['backend/.npm/', 'backend/node_modules/']
+  script:
+    - cd backend
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+  artifacts:
+    paths: ['backend/dist/']
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes: ['backend/**/*']

@@ -1,0 +1,14 @@
+# The frontend lives in frontend/. `base` makes Netlify run the build there.
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback so client-side routes (e.g. /detail/:id) resolve to index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

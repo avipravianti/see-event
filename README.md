@@ -1,70 +1,69 @@
-# Getting Started with Create React App
+# SeeEvent
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Create or find interesting events around the world — a fullstack TypeScript app.
 
-## Available Scripts
+This is a **monorepo**:
 
-In the project directory, you can run:
+```
+see-event/
+├── frontend/        React 18 + Vite + TypeScript + TanStack Query (see frontend/README.md)
+├── backend/         Express + TypeScript REST API           (see backend/README.md)
+├── Dockerfile       Combined production image (backend serves the frontend build)
+├── .dockerignore
+├── netlify.toml     Frontend deploy config (base = frontend)
+└── .github/, .gitlab-ci.yml   CI/CD for both apps
+```
 
-### `yarn start`
+## Quick start (local dev)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Run the two apps in separate terminals:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+# 1) Backend  →  http://localhost:4000
+cd backend
+npm install
+cp .env.example .env
+npm run dev
 
-### `yarn test`
+# 2) Frontend →  http://localhost:3000
+cd frontend
+npm install
+cp .env.example .env      # VITE_API_BASE_URL defaults to http://localhost:4000
+npm run dev
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+See [frontend/README.md](./frontend/README.md) and [backend/README.md](./backend/README.md)
+for per-app scripts, env vars, and the API reference.
 
-### `yarn build`
+## Run as a single container (Docker)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The root [`Dockerfile`](./Dockerfile) builds the frontend to static files, builds
+the backend, and runs the backend — which serves both the API and the frontend
+build on one port:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+docker build -t see-event .
+docker run -p 4000:4000 see-event
+# open http://localhost:4000
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+When `CLIENT_BUILD_DIR` is set (the image sets it automatically), the backend
+serves the SPA; otherwise it runs as a JSON-only API. The build arg
+`VITE_API_BASE_URL` defaults to empty so the frontend calls the API on the same
+origin.
 
-### `yarn eject`
+## CI/CD
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Pipelines run on **both GitHub and GitLab** off the `main` branch, each scoped by
+path so frontend-only changes don't trigger the backend pipeline and vice versa:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- GitHub Actions: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) (frontend → Netlify) and [`.github/workflows/backend-ci.yml`](./.github/workflows/backend-ci.yml)
+- GitLab CI: [`.gitlab-ci.yml`](./.gitlab-ci.yml) — `fe:*` and `be:*` jobs, plus SAST
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Required secrets / variables (for the frontend Netlify deploy)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+| Name                 | GitHub                  | GitLab         | Purpose                      |
+| -------------------- | ----------------------- | -------------- | ---------------------------- |
+| `VITE_API_BASE_URL`  | Repository **variable** | CI/CD variable | Backend URL baked into build |
+| `NETLIFY_AUTH_TOKEN` | Repository **secret**   | CI/CD variable | Netlify auth (deploy)        |
+| `NETLIFY_SITE_ID`    | Repository **secret**   | CI/CD variable | Target Netlify site          |
