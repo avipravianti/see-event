@@ -1,6 +1,6 @@
 # SeeEvent
 
-Create or find interesting events around the world — a fullstack TypeScript app.
+Create or find interesting events
 
 This is a **monorepo**:
 
