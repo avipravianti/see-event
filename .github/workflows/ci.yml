@@ -56,7 +56,9 @@ jobs:
     name: Deploy to Netlify
     needs: verify
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Runs only when you opt in by setting repo variable ENABLE_NETLIFY_DEPLOY=true
+    # (and the NETLIFY_* secrets). Until then the job is skipped, keeping CI green.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.ENABLE_NETLIFY_DEPLOY == 'true'
     defaults:
       run:
         working-directory: frontend

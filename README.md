@@ -62,8 +62,12 @@ path so frontend-only changes don't trigger the backend pipeline and vice versa:
 
 ### Required secrets / variables (for the frontend Netlify deploy)
 
-| Name                 | GitHub                  | GitLab         | Purpose                      |
-| -------------------- | ----------------------- | -------------- | ---------------------------- |
-| `VITE_API_BASE_URL`  | Repository **variable** | CI/CD variable | Backend URL baked into build |
-| `NETLIFY_AUTH_TOKEN` | Repository **secret**   | CI/CD variable | Netlify auth (deploy)        |
-| `NETLIFY_SITE_ID`    | Repository **secret**   | CI/CD variable | Target Netlify site          |
+The deploy job is **opt-in**: it stays skipped (CI green) until you set the
+`ENABLE_NETLIFY_DEPLOY` flag, then it runs on every push to `main`.
+
+| Name                    | GitHub                  | GitLab         | Purpose                          |
+| ----------------------- | ----------------------- | -------------- | -------------------------------- |
+| `ENABLE_NETLIFY_DEPLOY` | Repository **variable** = `true` | CI/CD variable = `true` | Turns the deploy job on |
+| `VITE_API_BASE_URL`     | Repository **variable** | CI/CD variable | Backend URL baked into build     |
+| `NETLIFY_AUTH_TOKEN`    | Repository **secret**   | CI/CD variable | Netlify auth (deploy)            |
+| `NETLIFY_SITE_ID`       | Repository **secret**   | CI/CD variable | Target Netlify site              |

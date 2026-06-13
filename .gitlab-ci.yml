@@ -57,8 +57,9 @@ fe:deploy:
     - netlify deploy --dir=frontend/build --prod --message "GitLab pipeline $CI_PIPELINE_IID"
   environment:
     name: production
+  # Runs only when ENABLE_NETLIFY_DEPLOY=true (and NETLIFY_* vars) are set.
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $ENABLE_NETLIFY_DEPLOY == "true"'
       changes: ['frontend/**/*']
 
 # ----- Backend (backend/) -------------------------------------------------
