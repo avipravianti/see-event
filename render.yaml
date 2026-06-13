@@ -1,0 +1,24 @@
+# Render Blueprint — deploys the combined Docker image (backend + frontend) as a
+# single always-reachable web service on Render's free tier.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Setup: Render Dashboard → New → Blueprint → connect this repo. Render reads
+# this file, builds the root Dockerfile, and deploys on every push to main.
+services:
+  - type: web
+    name: see-event
+    runtime: docker # if your Render account rejects this key, use: env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # JWT signing secret — Render generates a strong value once and keeps it.
+      - key: JWT_SECRET
+        generateValue: true
+      # PORT is injected by Render automatically; the app reads process.env.PORT.
+      # CLIENT_BUILD_DIR is baked into the image so the backend serves the SPA.
