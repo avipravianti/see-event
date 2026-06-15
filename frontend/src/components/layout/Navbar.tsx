@@ -2,6 +2,7 @@ import { AppBar, Box, Toolbar, Typography, Button, Avatar } from '@mui/material'
 import { Link, useLocation } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import { isAuthenticated } from '@/lib/apiClient';
+import { useAccount } from '@/api/auth';
 
 function stringToColor(value: string): string {
   let hash = 0;
@@ -16,10 +17,14 @@ function stringToColor(value: string): string {
   return color;
 }
 
-function avatarProps(name: string) {
-  const parts = name.split(' ');
-  const initials = `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}`;
-  return { sx: { bgcolor: stringToColor(name), margin: 'auto' }, children: initials };
+function avatarProps(name: string, image?: string) {
+  const parts = name.trim().split(' ');
+  const initials = `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}`.toUpperCase();
+  return {
+    src: image || undefined,
+    sx: { bgcolor: stringToColor(name), margin: 'auto' },
+    children: initials,
+  };
 }
 
 const navButtonSx = {
@@ -30,10 +35,28 @@ const navButtonSx = {
   textTransform: 'unset' as const,
 };
 
+const createButtonSx = {
+  height: '40px',
+  px: 2.5,
+  mr: 2,
+  fontFamily: 'Noto Sans',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  textTransform: 'unset' as const,
+  backgroundColor: '#FFC94A',
+  color: '#214457',
+  borderRadius: '20px',
+  '&:hover': { backgroundColor: '#f5bd2e' },
+};
+
 export default function Navbar() {
   const location = useLocation();
   const isHome = location.pathname === '/';
   const authed = isAuthenticated();
+  const { data: account } = useAccount();
+  const displayName = account
+    ? `${account.firstName} ${account.lastName ?? ''}`.trim()
+    : 'My Account';
 
   return (
     <AppBar
@@ -67,12 +90,15 @@ export default function Navbar() {
         </Link>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <Button component={Link} to="/create" variant="contained" sx={createButtonSx}>
+            Create Event
+          </Button>
           {authed ? (
             <Link to="/account">
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <Avatar {...avatarProps('My Account')} alt="account" />
+                <Avatar {...avatarProps(displayName, account?.image)} alt={displayName} />
                 <Typography sx={{ fontWeight: 'bold', fontSize: '16px', ml: '16px', color: 'white' }}>
-                  My Account
+                  {displayName}
                 </Typography>
               </Box>
             </Link>

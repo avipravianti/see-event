@@ -30,10 +30,24 @@ export interface EventDetail {
   id: number;
   title: string;
   time: string;
+  dateValue?: string;
   photoEvent: string;
   detail: string;
   category?: Category;
   user: EventUser;
+}
+
+/** Payload sent to POST /events and PUT /events/:id. */
+export interface EventInput {
+  title: string;
+  /** Human-readable date/time string shown on the listing + detail pages. */
+  time: string;
+  /** Raw datetime-local value (e.g. "2021-10-24T01:15") backing the picker. */
+  dateValue: string;
+  category: string;
+  detail: string;
+  /** Optional image URL; the backend falls back to a placeholder when omitted. */
+  photoEvent?: string;
 }
 
 export interface Comment {
@@ -65,6 +79,21 @@ export interface UserDetail {
   lastName: string;
   email: string;
   image?: string;
+}
+
+/** Payload sent to PUT /users to edit the profile. */
+export interface ProfileInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  /** Image URL or base64 data URL; empty string clears the picture. */
+  image?: string;
+}
+
+/** Payload sent to PUT /users/password. */
+export interface PasswordInput {
+  oldPassword: string;
+  newPassword: string;
 }
 
 /** Generic envelope helpers used by the backend responses. */

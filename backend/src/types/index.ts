@@ -1,5 +1,5 @@
 export interface Category {
-  id: number;
+  id?: number;
   name: string;
 }
 
@@ -19,6 +19,10 @@ export interface EventRecord {
   speakerName: string;
   detail: string;
   user: EventUser;
+  /** Raw datetime-local value (e.g. "2021-10-24T01:15") backing the date picker. */
+  dateValue?: string;
+  /** Id of the user who created the event; used to authorise edits. */
+  ownerId?: number;
 }
 
 export interface UserRecord {

@@ -1,8 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/apiClient';
+import { queryClient } from '@/lib/queryClient';
 import type {
   DataEnvelope,
   EventDetail,
+  EventInput,
   EventsListResponse,
   EventSummary,
   HomeEventsResponse,
@@ -45,6 +47,32 @@ export function useEventDetail(id: string | undefined) {
     queryFn: async (): Promise<EventDetail> => {
       const { data } = await apiClient.get<DataEnvelope<EventDetail>>(`/events/${id}`);
       return data.data;
+    },
+  });
+}
+
+/** Create a new event. Requires the user to be signed in. */
+export function useCreateEvent() {
+  return useMutation({
+    mutationFn: async (payload: EventInput): Promise<EventDetail> => {
+      const { data } = await apiClient.post<DataEnvelope<EventDetail>>('/events', payload);
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
+    },
+  });
+}
+
+/** Edit an existing event. Only the owner may do this. */
+export function useUpdateEvent(id: string | number) {
+  return useMutation({
+    mutationFn: async (payload: EventInput): Promise<EventDetail> => {
+      const { data } = await apiClient.put<DataEnvelope<EventDetail>>(`/events/${id}`, payload);
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
     },
   });
 }

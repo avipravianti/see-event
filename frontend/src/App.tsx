@@ -7,6 +7,7 @@ import SignUp from '@/pages/SignUp';
 import MyAccount from '@/pages/MyAccount';
 import Detail from '@/pages/Detail';
 import Search from '@/pages/Search';
+import EventForm from '@/pages/EventForm';
 import NotFound from '@/pages/NotFound';
 
 export default function App() {
@@ -19,6 +20,8 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/account" element={<MyAccount />} />
         <Route path="/detail/:id" element={<Detail />} />
+        <Route path="/create" element={<EventForm />} />
+        <Route path="/edit/:id" element={<EventForm />} />
         <Route path="/search" element={<Search />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

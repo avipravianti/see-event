@@ -1,0 +1,32 @@
+.event-form-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-form-wrapper {
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  margin: 80px 0;
+}
+
+.event-form-wrapper h1 {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: bold;
+  font-size: 40px;
+  line-height: 44px;
+  text-align: center;
+  color: #373737;
+  margin-bottom: 48px;
+}
+
+.event-form-help {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 25px;
+  text-align: center;
+  color: #3e89ae;
+  margin-top: 16px;
+}

@@ -1,0 +1,7 @@
+# Local env files — do not commit (may contain secrets).
+.env
+.env.local
+.env.*.local
+
+# Keep the template committed so others know which vars to set.
+!.env.example

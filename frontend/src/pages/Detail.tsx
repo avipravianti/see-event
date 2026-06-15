@@ -1,5 +1,6 @@
-import { useParams } from 'react-router-dom';
-import { Container, Grid, CircularProgress, Box, Typography } from '@mui/material';
+import { Link, useParams } from 'react-router-dom';
+import { Container, Grid, CircularProgress, Box, Typography, Button } from '@mui/material';
+import { isAuthenticated } from '@/lib/apiClient';
 import HeaderEvent from '@/components/event-detail/HeaderEvent';
 import HeaderPhoto from '@/components/event-detail/HeaderPhoto';
 import DetailsSection from '@/components/event-detail/DetailsSection';
@@ -31,6 +32,18 @@ export default function Detail() {
 
   return (
     <Container maxWidth="md" sx={{ mt: '64px' }}>
+      {isAuthenticated() ? (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+          <Button
+            component={Link}
+            to={`/edit/${event.id}`}
+            variant="outlined"
+            sx={{ textTransform: 'unset', color: '#214457', borderColor: '#214457' }}
+          >
+            Edit event
+          </Button>
+        </Box>
+      ) : null}
       <HeaderEvent title={event.title} time={event.time} category={event.category?.name} />
       <HeaderPhoto photoEvent={event.photoEvent} />
 

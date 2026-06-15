@@ -6,7 +6,7 @@ import type { CommentRecord, EventRecord, UserRecord } from '../types';
  * etc.) without changing the route/controller contracts.
  */
 
-const PLACEHOLDER_PHOTO = 'https://picsum.photos/seed/seeevent/600/400';
+export const PLACEHOLDER_PHOTO = 'https://picsum.photos/seed/seeevent/600/400';
 
 export const events: EventRecord[] = [
   {
@@ -20,6 +20,8 @@ export const events: EventRecord[] = [
     detail:
       'Join this workshop to learn proven strategies for scaling your business rapidly while keeping operations lean and customers happy.',
     user: { firstName: 'Adit', lastName: 'Nanto', image: PLACEHOLDER_PHOTO },
+    dateValue: '2021-10-24T01:15',
+    ownerId: 1,
   },
   {
     id: 2,
@@ -32,6 +34,8 @@ export const events: EventRecord[] = [
     detail:
       'A practical session on building a UX portfolio, acing interviews, and transitioning into a design career.',
     user: { firstName: 'Ernest', lastName: 'Prakasa', image: PLACEHOLDER_PHOTO },
+    dateValue: '2021-10-24T01:15',
+    ownerId: 1,
   },
   {
     id: 3,
@@ -43,6 +47,8 @@ export const events: EventRecord[] = [
     speakerName: 'Budi Setiawan',
     detail: 'Everything you need to launch your first profitable Google Ads campaign.',
     user: { firstName: 'Budi', lastName: 'Setiawan', image: PLACEHOLDER_PHOTO },
+    dateValue: '2021-10-24T01:15',
+    ownerId: 1,
   },
   {
     id: 4,
@@ -54,6 +60,8 @@ export const events: EventRecord[] = [
     speakerName: 'Agung Dwi Putra',
     detail: 'Learn how to build and maintain a scalable design system for your product team.',
     user: { firstName: 'Agung', lastName: 'Dwi Putra', image: PLACEHOLDER_PHOTO },
+    dateValue: '2021-10-24T01:15',
+    ownerId: 1,
   },
 ];
 
@@ -78,8 +86,13 @@ export const comments: CommentRecord[] = [
   },
 ];
 
+let nextEventId = events.length + 1;
 let nextUserId = users.length + 1;
 let nextCommentId = comments.length + 1;
+
+export function allocateEventId(): number {
+  return nextEventId++;
+}
 
 export function allocateUserId(): number {
   return nextUserId++;

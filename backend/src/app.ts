@@ -15,8 +15,9 @@ export function createApp(): Application {
       origin: env.corsOrigins.length > 0 ? env.corsOrigins : true,
     }),
   );
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  // Raised from the 100kb default so base64-encoded profile/event images fit.
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });

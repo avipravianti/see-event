@@ -1,12 +1,17 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient, getToken, setToken } from '@/lib/apiClient';
+import { queryClient } from '@/lib/queryClient';
 import type {
   AuthResponse,
   DataEnvelope,
+  PasswordInput,
+  ProfileInput,
   SignInPayload,
   SignUpPayload,
   UserDetail,
 } from '@/types';
+
+const accountKey = ['account'] as const;
 
 export function useSignIn() {
   return useMutation({
@@ -31,11 +36,31 @@ export function useSignUp() {
 
 export function useAccount() {
   return useQuery({
-    queryKey: ['account'],
+    queryKey: accountKey,
     enabled: Boolean(getToken()),
     queryFn: async (): Promise<UserDetail> => {
       const { data } = await apiClient.get<DataEnvelope<UserDetail>>('/users');
       return data.data;
+    },
+  });
+}
+
+export function useUpdateProfile() {
+  return useMutation({
+    mutationFn: async (payload: ProfileInput): Promise<UserDetail> => {
+      const { data } = await apiClient.put<DataEnvelope<UserDetail>>('/users', payload);
+      return data.data;
+    },
+    onSuccess: (user) => {
+      queryClient.setQueryData(accountKey, user);
+    },
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: async (payload: PasswordInput): Promise<void> => {
+      await apiClient.put('/users/password', payload);
     },
   });
 }
