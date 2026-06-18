@@ -4,21 +4,37 @@ import { Stack, Container, Typography, CircularProgress, Box } from '@mui/materi
 import EventCard from '@/components/cards/EventCard';
 import SearchFilter from '@/components/search-filter/SearchFilter';
 import { useEvents } from '@/api/events';
+import { matchesDateBucket, parseEventDate } from '@/utils/eventDate';
 
 export default function Search() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q')?.toLowerCase() ?? '';
+  const category = searchParams.get('category') ?? '';
+  const date = searchParams.get('date') ?? '';
   const { data: events = [], isLoading } = useEvents();
 
+  // Category options come from the events that actually exist.
+  const categories = useMemo(
+    () =>
+      Array.from(new Set(events.map((e) => e.category?.name).filter(Boolean) as string[])).sort(),
+    [events],
+  );
+
   const filtered = useMemo(
-    () => (query ? events.filter((e) => e.title.toLowerCase().includes(query)) : events),
-    [events, query],
+    () =>
+      events.filter((e) => {
+        if (query && !e.title.toLowerCase().includes(query)) return false;
+        if (category && (e.category?.name ?? '') !== category) return false;
+        if (!matchesDateBucket(parseEventDate(e), date)) return false;
+        return true;
+      }),
+    [events, query, category, date],
   );
 
   return (
     <Container maxWidth="xl" sx={{ mt: '64px' }}>
-      <SearchFilter />
+      <SearchFilter categories={categories} />
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: '50px' }}>
           <CircularProgress />

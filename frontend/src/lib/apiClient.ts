@@ -5,10 +5,12 @@ const baseURL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 /**
  * Shared axios instance. Centralises the base URL (from env, no more hardcoded
  * Heroku URLs) and automatically attaches the auth token on every request.
+ *
+ * No fixed Content-Type: axios sets `application/json` for plain objects and
+ * `multipart/form-data` (with boundary) for FormData uploads automatically.
  */
 export const apiClient = axios.create({
   baseURL,
-  headers: { 'Content-Type': 'application/json' },
 });
 
 apiClient.interceptors.request.use((config) => {

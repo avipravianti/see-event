@@ -12,7 +12,11 @@ export default function CreatedBySection({ user }: CreatedBySectionProps) {
     <Grid item xs={6}>
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
         {user?.image ? (
-          <img src={user.image} alt={user.firstName} style={{ width: 64, borderRadius: '50%' }} />
+          <img
+            src={user.image}
+            alt={user.firstName}
+            style={{ width: 50, borderRadius: '50%', height: 50 }}
+          />
         ) : null}
         <Box>
           <Typography sx={{ fontFamily: 'Noto Sans', fontSize: '12px' }}>Created by</Typography>

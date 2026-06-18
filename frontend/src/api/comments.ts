@@ -4,13 +4,17 @@ import type { Comment, DataEnvelope } from '@/types';
 
 export const commentKeys = {
   all: ['comments'] as const,
+  forEvent: (eventId?: number) => [...commentKeys.all, { eventId }] as const,
 };
 
-export function useComments() {
+/** Comments for a single event (or all comments when no eventId is given). */
+export function useComments(eventId?: number) {
   return useQuery({
-    queryKey: commentKeys.all,
+    queryKey: commentKeys.forEvent(eventId),
     queryFn: async (): Promise<Comment[]> => {
-      const { data } = await apiClient.get<DataEnvelope<Comment[]>>('/comments');
+      const { data } = await apiClient.get<DataEnvelope<Comment[]>>('/comments', {
+        params: eventId ? { eventId } : undefined,
+      });
       // newest first
       return [...(data.data ?? [])].reverse();
     },

@@ -19,6 +19,11 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
     res.status(err.status).json({ message: err.message });
     return;
   }
+  // multer rejects (file too large, wrong type) are client errors, not 500s.
+  if (err instanceof Error && (err.name === 'MulterError' || /image files/i.test(err.message))) {
+    res.status(400).json({ message: err.message });
+    return;
+  }
   console.error(err);
   res.status(500).json({ message: 'Internal server error' });
 }

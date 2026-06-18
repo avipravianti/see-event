@@ -17,6 +17,20 @@ export const eventKeys = {
   detail: (id: string | number) => [...eventKeys.all, 'detail', String(id)] as const,
 };
 
+/** Build multipart form data so the optional image file can be uploaded. */
+function toEventFormData(payload: EventInput): FormData {
+  const formData = new FormData();
+  formData.append('title', payload.title);
+  formData.append('time', payload.time);
+  formData.append('dateValue', payload.dateValue);
+  formData.append('category', payload.category);
+  formData.append('detail', payload.detail);
+  if (payload.image) {
+    formData.append('image', payload.image);
+  }
+  return formData;
+}
+
 /** Events starting soon, shown on the home page. */
 export function useHomeEvents() {
   return useQuery({
@@ -55,7 +69,10 @@ export function useEventDetail(id: string | undefined) {
 export function useCreateEvent() {
   return useMutation({
     mutationFn: async (payload: EventInput): Promise<EventDetail> => {
-      const { data } = await apiClient.post<DataEnvelope<EventDetail>>('/events', payload);
+      const { data } = await apiClient.post<DataEnvelope<EventDetail>>(
+        '/events',
+        toEventFormData(payload),
+      );
       return data.data;
     },
     onSuccess: () => {
@@ -68,7 +85,10 @@ export function useCreateEvent() {
 export function useUpdateEvent(id: string | number) {
   return useMutation({
     mutationFn: async (payload: EventInput): Promise<EventDetail> => {
-      const { data } = await apiClient.put<DataEnvelope<EventDetail>>(`/events/${id}`, payload);
+      const { data } = await apiClient.put<DataEnvelope<EventDetail>>(
+        `/events/${id}`,
+        toEventFormData(payload),
+      );
       return data.data;
     },
     onSuccess: () => {

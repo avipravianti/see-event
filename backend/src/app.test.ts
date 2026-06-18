@@ -46,12 +46,33 @@ describe('SeeEvent API', () => {
     expect(res.status).toBe(401);
   });
 
-  it('creates a comment', async () => {
-    const res = await request(app)
+  it('rejects commenting without a token', async () => {
+    const res = await request(app).post('/comments').send({ comment: 'Nice event!', eventId: 1 });
+    expect(res.status).toBe(401);
+  });
+
+  it('creates a comment attributed to the signed-in account, scoped to the event', async () => {
+    const signin = await request(app)
+      .post('/users/signin')
+      .send({ email: 'pratur345@gmail.com', password: 'secret123' });
+    const token = signin.body.token as string;
+
+    const created = await request(app)
       .post('/comments')
+      .set('token', token)
       .send({ comment: 'Nice event!', eventId: 1 });
-    expect(res.status).toBe(201);
-    expect(res.body.data.comment).toBe('Nice event!');
+    expect(created.status).toBe(201);
+    expect(created.body.data.comment).toBe('Nice event!');
+    // Author name is derived from the account, not sent by the client.
+    expect(created.body.data.authorName).toBe('Pratur Anahata');
+
+    // GET filtered by eventId returns only that event's comments.
+    const forEvent1 = await request(app).get('/comments').query({ eventId: 1 });
+    expect(forEvent1.status).toBe(200);
+    expect(forEvent1.body.data.every((c: { eventId?: number }) => c.eventId === 1)).toBe(true);
+
+    const forEvent999 = await request(app).get('/comments').query({ eventId: 999 });
+    expect(forEvent999.body.data).toHaveLength(0);
   });
 
   it('rejects creating an event without a token', async () => {
@@ -94,6 +115,36 @@ describe('SeeEvent API', () => {
   it('requires a title when creating an event', async () => {
     const token = await signInSeededUser();
     const res = await request(app).post('/events').set('token', token).send({ detail: 'no title' });
+    expect(res.status).toBe(400);
+  });
+
+  it('creates an event with an uploaded image, stored as a data URL', async () => {
+    const token = await signInSeededUser();
+    // A tiny 1x1 PNG.
+    const png = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/1n3AAAAAElFTkSuQmCC',
+      'base64',
+    );
+
+    const res = await request(app)
+      .post('/events')
+      .set('token', token)
+      .field('title', 'Photo Walk')
+      .field('category', 'Design')
+      .field('detail', 'Bring a camera.')
+      .attach('image', png, 'cover.png');
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.photoEvent).toMatch(/^data:image\/png;base64,/);
+  });
+
+  it('rejects a non-image upload', async () => {
+    const token = await signInSeededUser();
+    const res = await request(app)
+      .post('/events')
+      .set('token', token)
+      .field('title', 'Bad upload')
+      .attach('image', Buffer.from('not an image'), 'notes.txt');
     expect(res.status).toBe(400);
   });
 

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { allocateEventId, events, PLACEHOLDER_PHOTO, users } from '../data/store';
 import { authenticate } from '../middleware/auth';
+import { fileToDataUrl, uploadEventImage } from '../middleware/upload';
 import type { Category, EventRecord } from '../types';
 
 const router = Router();
@@ -39,7 +40,8 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /events — create a new event (must be authenticated).
-router.post('/', authenticate, (req, res) => {
+// Accepts multipart/form-data with an optional `image` file upload.
+router.post('/', authenticate, uploadEventImage, (req, res) => {
   const { title, detail, time, dateStart, dateValue, category, photoEvent } = req.body ?? {};
 
   if (!title || String(title).trim().length === 0) {
@@ -49,11 +51,13 @@ router.post('/', authenticate, (req, res) => {
 
   const owner = users.find((u) => u.id === req.auth?.id);
   const when = String(dateStart ?? time ?? '');
+  // Prefer an uploaded file, fall back to an explicit URL, then a placeholder.
+  const image = req.file ? fileToDataUrl(req.file) : photoEvent ? String(photoEvent) : undefined;
 
   const record: EventRecord = {
     id: allocateEventId(),
     title: String(title),
-    photoEvent: photoEvent ? String(photoEvent) : PLACEHOLDER_PHOTO,
+    photoEvent: image ?? PLACEHOLDER_PHOTO,
     category: normaliseCategory(category),
     dateStart: when,
     time: when,
@@ -71,7 +75,8 @@ router.post('/', authenticate, (req, res) => {
 });
 
 // PUT /events/:id — edit an event (owner only).
-router.put('/:id', authenticate, (req, res) => {
+// Accepts multipart/form-data with an optional `image` file upload.
+router.put('/:id', authenticate, uploadEventImage, (req, res) => {
   const id = Number(req.params.id);
   const event = events.find((e) => e.id === id);
 
@@ -86,6 +91,13 @@ router.put('/:id', authenticate, (req, res) => {
 
   const { title, detail, time, dateStart, dateValue, category, photoEvent } = req.body ?? {};
 
+  // A newly uploaded file wins; otherwise an explicit photoEvent URL may update it.
+  if (req.file) {
+    event.photoEvent = fileToDataUrl(req.file);
+  } else if (photoEvent !== undefined && String(photoEvent).length > 0) {
+    event.photoEvent = String(photoEvent);
+  }
+
   if (title !== undefined) {
     if (String(title).trim().length === 0) {
       res.status(400).json({ message: 'Title cannot be empty' });
@@ -95,7 +107,6 @@ router.put('/:id', authenticate, (req, res) => {
   }
   if (detail !== undefined) event.detail = String(detail);
   if (category !== undefined) event.category = normaliseCategory(category);
-  if (photoEvent !== undefined) event.photoEvent = String(photoEvent);
   if (dateValue !== undefined) event.dateValue = String(dateValue);
   if (dateStart !== undefined || time !== undefined) {
     const when = String(dateStart ?? time);

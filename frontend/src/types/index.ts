@@ -19,6 +19,8 @@ export interface EventSummary {
   dateStart?: string;
   /** Present on the generic /events listing. */
   time?: string;
+  /** Raw datetime-local value backing the date picker (events created via the form). */
+  dateValue?: string;
   /** Home feed exposes the speaker name directly. */
   speakerName?: string;
   /** Search listing nests the organiser under `user`. */
@@ -46,8 +48,8 @@ export interface EventInput {
   dateValue: string;
   category: string;
   detail: string;
-  /** Optional image URL; the backend falls back to a placeholder when omitted. */
-  photoEvent?: string;
+  /** Uploaded image file. The backend stores it as a data URL. */
+  image?: File | null;
 }
 
 export interface Comment {
@@ -55,6 +57,11 @@ export interface Comment {
   comment: string;
   userId?: number;
   eventId?: number;
+  /** Author name resolved from the account by the backend. */
+  authorName?: string;
+  /** Author avatar image, when set on the account. */
+  authorImage?: string;
+  createdAt?: string;
 }
 
 export interface SignInPayload {

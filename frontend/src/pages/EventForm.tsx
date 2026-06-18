@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
+  Button,
   CircularProgress,
   FormControl,
   FormHelperText,
@@ -27,7 +28,7 @@ const EMPTY: EventInput = {
   dateValue: '',
   category: '',
   detail: '',
-  photoEvent: '',
+  image: null,
 };
 
 const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -60,6 +61,9 @@ export default function EventForm() {
 
   const [values, setValues] = useState<EventInput>(EMPTY);
   const [errors, setErrors] = useState<EventErrors>({});
+  // Preview shows either the newly selected file (blob: URL) or, when editing,
+  // the event's current image.
+  const [preview, setPreview] = useState('');
 
   // Only signed-in users can create or edit events.
   useEffect(() => {
@@ -75,10 +79,18 @@ export default function EventForm() {
         dateValue: existing.dateValue ?? '',
         category: existing.category?.name ?? '',
         detail: existing.detail ?? '',
-        photoEvent: existing.photoEvent ?? '',
+        image: null,
       });
+      setPreview(existing.photoEvent ?? '');
     }
   }, [existing]);
+
+  // Release the object URL created for a selected file when it changes/unmounts.
+  useEffect(() => {
+    return () => {
+      if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   const changeValue = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -86,6 +98,12 @@ export default function EventForm() {
 
   const changeCategory = (e: SelectChangeEvent) => {
     setValues((prev) => ({ ...prev, category: e.target.value }));
+  };
+
+  const changeImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setValues((prev) => ({ ...prev, image: file }));
+    setPreview(file ? URL.createObjectURL(file) : (existing?.photoEvent ?? ''));
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -159,14 +177,31 @@ export default function EventForm() {
             fullWidth
             sx={{ mb: 2 }}
           />
-          <TextField
-            name="photoEvent"
-            label="Image URL (optional)"
-            value={values.photoEvent}
-            onChange={changeValue}
-            fullWidth
-            sx={{ mb: 2 }}
-          />
+          <Box sx={{ mb: 2 }}>
+            {preview ? (
+              <Box
+                component="img"
+                src={preview}
+                alt="event preview"
+                sx={{
+                  width: '100%',
+                  maxHeight: 240,
+                  objectFit: 'cover',
+                  borderRadius: 1,
+                  mb: 1,
+                  display: 'block',
+                }}
+              />
+            ) : null}
+            <Button variant="outlined" component="label" fullWidth sx={{ textTransform: 'unset' }}>
+              {values.image
+                ? values.image.name
+                : isEdit
+                  ? 'Change event image'
+                  : 'Upload event image'}
+              <input type="file" accept="image/*" hidden onChange={changeImage} />
+            </Button>
+          </Box>
           <ButtonLog text={isEdit ? 'Save Changes' : 'Create'} disabled={mutation.isPending} />
         </form>
         <Typography className="event-form-help">
